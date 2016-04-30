@@ -1,8 +1,3 @@
-[rafael@rafael-pc karatsuba]$ time ./karatsuba > /dev/null
-
-real	0m0.001s
-user	0m0.000s
-sys	0m0.000s
 [rafael@rafael-pc karatsuba]$ time ./karatsuba $(cat input1) > /dev/null
 
 real	0m5.953s
