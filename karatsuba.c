@@ -23,7 +23,7 @@
 #include <string.h>
 
 /* Tamanho a partir do qual será executada a multiplicação "ingênua" */
-#define CUTOFF                4
+#define CUTOFF                8
 /* Tamanho da granularidade (elementos) dos Big Numbers */
 #define BIGNUM_GRANULE_SIZE   sizeof(char)
 
