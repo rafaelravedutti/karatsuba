@@ -1,5 +1,6 @@
 /*
  * Karatsuba - "Divide and Conquer" Big Number Multiplication Solver
+ *
  * Copyright (C) 2016  Felix Yowtang Liu
  *                     Rafael Ravedutti Lucio Machado
  * 
