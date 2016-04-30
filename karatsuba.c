@@ -2,16 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Tamanho a partir do qual será executada a multiplicação "ingênua" */
 #define CUTOFF                4
+/* Tamanho da granularidade (elementos) dos Big Numbers */
 #define BIGNUM_GRANULE_SIZE   sizeof(char)
 
+/* Big Number */
 typedef char *big_number_t;
 
+/* Funções de multiplicação */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n);
-void fprint_big_number(FILE *out, big_number_t x, unsigned int n);
 
+/* Funções auxiliares */
+void fprint_big_number(FILE *out, big_number_t x, unsigned int n);
+void fix_carry(big_number_t x, unsigned int n);
+unsigned int min_power_of_2(unsigned int n1, unsigned int n2);
+
+/* Multiplicação "ingênua" */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
   unsigned int i, j;
 
@@ -26,6 +35,7 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
   }
 }
 
+/* Karatsuba */
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
   big_number_t dump;
 
@@ -74,6 +84,8 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
   }
 }
 
+/* Função para corrigir os carries, quando algum elemento no Big Number é
+   maior do que 10 */
 void fix_carry(big_number_t x, unsigned int n) {
   unsigned int i;
   int carry = 0;
@@ -95,6 +107,7 @@ void fix_carry(big_number_t x, unsigned int n) {
   }
 }
 
+/* Imprime um Big Number na saída especificada */
 void fprint_big_number(FILE *out, big_number_t x, unsigned int n) {
   int i;
 
@@ -105,6 +118,7 @@ void fprint_big_number(FILE *out, big_number_t x, unsigned int n) {
   }
 }
 
+/* Obtêm a menor potência de 2 maior que n1 e n2 */
 unsigned int min_power_of_2(unsigned int n1, unsigned int n2) {
   unsigned int result = 2;
 
@@ -115,6 +129,7 @@ unsigned int min_power_of_2(unsigned int n1, unsigned int n2) {
   return result;
 }
 
+/* Função principal */
 int main(int argc, const char *argv[]) {
   big_number_t x, y, d;
   unsigned int n, len1, len2, i;
