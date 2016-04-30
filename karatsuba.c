@@ -44,8 +44,8 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
 
   m = n / 2;
 
-  z2 = dest;
-  z0 = dest + n;
+  z0 = dest;
+  z2 = dest + n;
 
   z1 = dump;
   z1_factor[0] = dump + n;
@@ -54,18 +54,22 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
   if(n <= CUTOFF) {
     naive_multiplication(x, y, dest, n);
   } else {
-    _karatsuba(x, y, z0, dump + (2 * n), m);
-    _karatsuba(x + m, y + m, z1, dump + (2 * n), m);
+    _karatsuba(x, y, z0, dump + (n * 2), m);
+    _karatsuba(x + m, y + m, z2, dump + (n * 2), m);
 
     for(i = 0; i < m; ++i) {
-      z1_factor[0][i] = x[i] + y[m + i];
+      z1_factor[0][i] = x[i] + x[m + i];
       z1_factor[1][i] = y[i] + y[m + i];
     }
 
-    _karatsuba(z1_factor[0], z1_factor[1], z1, dump + (2 * n), m);
+    _karatsuba(z1_factor[0], z1_factor[1], z1, dump + (n * 2), m);
 
     for(i = 0; i < n; ++i) {
-      dest[i + m] += z1[i] - z2[i] - z0[i];
+      z1[i] = z1[i] - z2[i] - z0[i];
+    }
+
+    for(i = 0; i < n; ++i) {
+      dest[i + m] += z1[i];
     }
   }
 }
