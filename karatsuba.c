@@ -4,8 +4,6 @@
 
 #define CUTOFF                4
 #define BIGNUM_GRANULE_SIZE   sizeof(char)
-#define max(a,b)              ((a > b) ? (a) : (b))
-#define min(a,b)              ((a < b) ? (a) : (b))
 
 typedef char *big_number_t;
 
@@ -40,11 +38,6 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 }
 
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n) {
-  fprintf(stdout, "karatsuba(");
-  fprint_big_number(stdout, x, n);
-  fprintf(stdout, ", ");
-  fprint_big_number(stdout, y, n);
-  fprintf(stdout, ")\n");
   unsigned int m, i;
   big_number_t z0, z1, z2;
   big_number_t z1_factor[2];
@@ -120,7 +113,7 @@ unsigned int min_power_of_2(unsigned int n1, unsigned int n2) {
 
 int main(int argc, const char *argv[]) {
   big_number_t x, y, d;
-  unsigned int n, min_len, len1, len2, i;
+  unsigned int n, len1, len2, i;
   int p1, p2;
 
   if(argc < 3) {
