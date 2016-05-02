@@ -3,7 +3,7 @@
 #include <string.h>
 
 /* Tamanho a partir do qual será executada a multiplicação "ingênua" */
-#define CUTOFF                4
+#define CUTOFF                8
 /* Tamanho da granularidade (elementos) dos Big Numbers */
 #define BIGNUM_GRANULE_SIZE   sizeof(char)
 
@@ -12,6 +12,7 @@ typedef char *big_number_t;
 
 /* Funções de multiplicação */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
+void naive_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n);
 
@@ -23,23 +24,45 @@ unsigned int min_power_of_2(unsigned int n1, unsigned int n2);
 /* Multiplicação "ingênua" */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
   unsigned int i, j;
+  char res;
+  int carry;
 
   for(i = 0; i < n * 2; ++i) {
     dest[i] = 0;
   }
 
   for(i = 0; i < n; ++i) {
+    carry = 0;
+
     for(j = 0; j < n; ++j) {
-      dest[i + j] += x[i] * y[j];
+      res = carry + dest[i + j] + x[i] * y[j];
+      dest[i + j] = res % 10;
+      carry = res / 10;
     }
+
+    dest[i + n] = carry;
   }
+}
+
+/* Soma "ingênua" */
+void naive_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
+  char carry, res;
+  unsigned int i;
+
+  for(i = 0, carry = 0; i < n; ++i) {
+    res = (x[i] + y[i] + carry) % 10;
+    dest[i] = res % 10;
+    carry = res / 10;
+  }
+
+  dest[n] = carry;
 }
 
 /* Karatsuba */
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
   big_number_t dump;
 
-  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * n * 4);
+  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * (n + 1) * 4);
 
   if(dump != NULL) {
     _karatsuba(x, y, dest, dump, n);
@@ -48,8 +71,9 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 }
 
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n) {
+  char res, carry;
   unsigned int m, i;
-  big_number_t z0, z1, z2;
+  big_number_t z0, z1, z2, z0_plus_z2;
   big_number_t z1_factor[2];
 
   m = n / 2;
@@ -59,51 +83,29 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
 
   z1 = dump;
   z1_factor[0] = dump + n;
-  z1_factor[1] = dump + n + m;
+  z1_factor[1] = dump + n + m + 1;
 
   if(n <= CUTOFF) {
     naive_multiplication(x, y, dest, n);
   } else {
-    _karatsuba(x, y, z0, dump + (n * 2), m);
-    _karatsuba(x + m, y + m, z2, dump + (n * 2), m);
+    _karatsuba(x, y, z0, dump + ((n + 1) * 2), m);
+    _karatsuba(x + m, y + m, z2, dump + ((n + 1) * 2), m);
 
-    for(i = 0; i < m; ++i) {
-      z1_factor[0][i] = x[i] + x[m + i];
-      z1_factor[1][i] = y[i] + y[m + i];
+    naive_summation(x, x + m, z1_factor[0], m);
+    naive_summation(y, y + m, z1_factor[1], m);
+    
+    _karatsuba(z1_factor[0], z1_factor[1], z1, dump + ((n + 1) * 2), m);
+
+    z0_plus_z2 = dump + n;
+    naive_summation(z0, z2, z0_plus_z2, n);
+
+    for(i = 0, carry = 1; i < n; ++i) {
+      res = 9 - z0_plus_z2[i] + z1[i] + carry;
+      z1[i] = res % 10;
+      carry = res / 10;
     }
 
-    _karatsuba(z1_factor[0], z1_factor[1], z1, dump + (n * 2), m);
-
-    for(i = 0; i < n; ++i) {
-      z1[i] = z1[i] - z2[i] - z0[i];
-    }
-
-    for(i = 0; i < n; ++i) {
-      dest[i + m] += z1[i];
-    }
-  }
-}
-
-/* Função para corrigir os carries, quando algum elemento no Big Number é
-   maior do que 10 */
-void fix_carry(big_number_t x, unsigned int n) {
-  unsigned int i;
-  int carry = 0;
-
-  for(i = 0; i < n; ++i) {
-    x[i] += carry;
-
-    if(x[i] < 0) {
-      carry = (-(x[i] + 1) / 10) + 1; 
-    } else {
-      carry = x[i] / 10;
-    }
-
-    x[i] -= carry * 10;
-  }
-
-  if(carry > 0) {
-    fprintf(stderr, "Overflow occured at 0x%p !!!\n", x);
+    naive_summation(dest + m, z1, dest + m, n);
   }
 }
 
@@ -168,7 +170,6 @@ int main(int argc, const char *argv[]) {
   }
 
   karatsuba(x, y, d, n);
-  fix_carry(d, n * 2);
 
   fprint_big_number(stdout, x, n);
   fprintf(stdout, " x ");
