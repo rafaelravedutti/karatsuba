@@ -33,7 +33,8 @@ typedef char *big_number_t;
 
 /* Funções de multiplicação */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
-void naive_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
+void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
+void big_number_subtraction(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n);
 
@@ -65,18 +66,39 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
   }
 }
 
-/* Soma "ingênua" */
-void naive_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
+/* Soma de Big Numbers */
+void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
   char carry, res;
   unsigned int i;
 
   for(i = 0, carry = 0; i < n; ++i) {
-    res = (x[i] + y[i] + carry) % 10;
+    res = x[i] + y[i] + carry;
     dest[i] = res % 10;
     carry = res / 10;
   }
 
   dest[n] = carry;
+}
+
+/* Subtração de Big Numbers */
+void big_number_subtraction(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
+  char carry, res;
+  unsigned int i;
+
+  fprintf(stdout, "\nSUB: ");
+  fprint_big_number(stdout, x, n);
+  fprintf(stdout, " - ");
+  fprint_big_number(stdout, y, n);
+
+  for(i = 0, carry = 1; i < n; ++i) {
+    res = 9 - y[i] + x[i] + carry;
+    dest[i] = res % 10;
+    carry = res / 10;
+  }
+
+  fprintf(stdout, " = ");
+  fprint_big_number(stdout, dest, n);
+  fprintf(stdout, "\n");
 }
 
 /* Karatsuba */
@@ -92,9 +114,8 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 }
 
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n) {
-  char res, carry;
-  unsigned int m, i;
-  big_number_t z0, z1, z2, z0_plus_z2;
+  unsigned int m;
+  big_number_t z0, z1, z2, temp;
   big_number_t z1_factor[2];
 
   m = n / 2;
@@ -106,27 +127,22 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
   z1_factor[0] = dump + n;
   z1_factor[1] = dump + n + m + 1;
 
+  temp = dump + n;
+
   if(n <= CUTOFF) {
     naive_multiplication(x, y, dest, n);
   } else {
     _karatsuba(x, y, z0, dump + ((n + 1) * 2), m);
     _karatsuba(x + m, y + m, z2, dump + ((n + 1) * 2), m);
 
-    naive_summation(x, x + m, z1_factor[0], m);
-    naive_summation(y, y + m, z1_factor[1], m);
+    big_number_summation(x, x + m, z1_factor[0], m);
+    big_number_summation(y, y + m, z1_factor[1], m);
     
     _karatsuba(z1_factor[0], z1_factor[1], z1, dump + ((n + 1) * 2), m);
 
-    z0_plus_z2 = dump + n;
-    naive_summation(z0, z2, z0_plus_z2, n);
-
-    for(i = 0, carry = 1; i < n; ++i) {
-      res = 9 - z0_plus_z2[i] + z1[i] + carry;
-      z1[i] = res % 10;
-      carry = res / 10;
-    }
-
-    naive_summation(dest + m, z1, dest + m, n);
+    big_number_summation(z0, z2, temp, n);
+    big_number_subtraction(z1, temp, z1, n);
+    big_number_summation(dest + m, z1, dest + m, n);
   }
 }
 
