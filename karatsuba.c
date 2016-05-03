@@ -113,7 +113,7 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
   big_number_t dump;
 
   /* Aloca região de memória usada para armazenar resultados temporários */
-  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * (n + 1) * 4);
+  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * (n * 2 + 2) * 2);
 
   /* Se não ocorreu erro ao alocar */
   if(dump != NULL) {
@@ -127,8 +127,7 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 /* Karatsuba (recursões) */
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n) {
   unsigned int m;
-  big_number_t z0, z1, z2, temp;
-  big_number_t z1_factor[2];
+  big_number_t z0, z1, z2, z1f1, z1f2, temp_sum;
 
   /* Define m, como n é sempre potência de 2, então n / 2 será inteiro em
      todas as recursões, por questões de facilidade */
@@ -141,11 +140,11 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
 
   /* Usa a região de dump para calcular z1 e seus fatores (x0+xm e y0+ym) */
   z1 = dump;
-  z1_factor[0] = dump + n;
-  z1_factor[1] = dump + n + m + 1;
+  z1f1 = dump + n;
+  z1f2 = dump + n + m + 1;
 
   /* Região temporária para armazenar z0 + z2 */
-  temp = dump + n;
+  temp_sum = dump + n;
 
   /* Se o tamanho é menor que o CUTOFF, resolve utilizando a multiplicação "ingênua",
      este procedimento é feito para evitar diversas chamadas de funções e operações com pilha */
@@ -154,20 +153,20 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
   /* Caso contrário, resolve recursões */
   } else {
     /* Resolve z0 recursivamente */
-    _karatsuba(x, y, z0, dump + ((n + 1) * 2), m);
+    _karatsuba(x, y, z0, dump + (n * 2) + 2, m);
     /* Resolve z2 recursivamente */
-    _karatsuba(x + m, y + m, z2, dump + ((n + 1) * 2), m);
+    _karatsuba(x + m, y + m, z2, dump + (n * 2) + 2, m);
 
     /* Calcula os fatores de z1 */
-    big_number_summation(x, x + m, z1_factor[0], m);
-    big_number_summation(y, y + m, z1_factor[1], m);
+    big_number_summation(x, x + m, z1f1, m);
+    big_number_summation(y, y + m, z1f2, m);
     
     /* Resolve z1 recursivamente */
-    _karatsuba(z1_factor[0], z1_factor[1], z1, dump + ((n + 1) * 2), m);
+    _karatsuba(z1f1, z1f2, z1, dump + (n * 2) + 2, m);
 
     /* Subtrai em z1 os valores de z2 e z0 conforme especificação */
-    big_number_summation(z0, z2, temp, n);
-    big_number_subtraction(z1, temp, z1, n);
+    big_number_summation(z0, z2, temp_sum, n);
+    big_number_subtraction(z1, temp_sum, z1, n);
 
     /* Adiciona z1 no resultado em [n/2...2n/3] */
     big_number_summation(dest + m, z1, dest + m, n);
