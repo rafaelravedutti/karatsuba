@@ -113,7 +113,7 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
   big_number_t dump;
 
   /* Aloca região de memória usada para armazenar resultados temporários */
-  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * (n * 2 + 2) * 2);
+  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * (n + 4) * 4);
 
   /* Se não ocorreu erro ao alocar */
   if(dump != NULL) {
@@ -126,6 +126,9 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 
 /* Karatsuba (recursões) */
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n) {
+  fprint_big_number(stdout, x, n);
+  fprintf(stdout, " x ");
+  fprint_big_number(stdout, y, n);
   unsigned int m;
   big_number_t z0, z1, z2, z1f1, z1f2, temp_sum;
 
@@ -136,15 +139,15 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
   /* z0 aponta para o resultado em [0..n-1] e z2 aponta para o resultado em [n..2n-1],
      conforme especificação do algoritmo */
   z0 = dest;
-  z2 = dest + n;
+  z2 = dest + m + m;
 
   /* Usa a região de dump para calcular z1 e seus fatores (x0+xm e y0+ym) */
   z1 = dump;
-  z1f1 = dump + n;
-  z1f2 = dump + n + m + 1;
+  z1f1 = dump + n + 4;
+  z1f2 = dump + n + 4 + m + 2;
 
   /* Região temporária para armazenar z0 + z2 */
-  temp_sum = dump + n;
+  temp_sum = dump + n + 4;
 
   /* Se o tamanho é menor que o CUTOFF, resolve utilizando a multiplicação "ingênua",
      este procedimento é feito para evitar diversas chamadas de funções e operações com pilha */
@@ -153,23 +156,41 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
   /* Caso contrário, resolve recursões */
   } else {
     /* Resolve z0 recursivamente */
-    _karatsuba(x, y, z0, dump + (n * 2) + 2, m);
+    _karatsuba(x, y, z0, dump + (n + 4) * 2, m);
     /* Resolve z2 recursivamente */
-    _karatsuba(x + m, y + m, z2, dump + (n * 2) + 2, m);
+    _karatsuba(x + m, y + m, z2, dump + (n + 4) * 2, n - m);
 
     /* Calcula os fatores de z1 */
     big_number_summation(x, x + m, z1f1, m);
     big_number_summation(y, y + m, z1f2, m);
-    
+
+    if(n % 2 != 0) {
+      char soma = z1f1[m] + x[m + m];
+      z1f1[m] = soma % 10;
+      z1f1[m + 1] = soma / 10;
+
+      soma = z1f2[m] + y[m + m];
+      z1f2[m] = soma % 10;
+      z1f2[m + 1] = soma / 10;
+    }
+
     /* Resolve z1 recursivamente */
-    _karatsuba(z1f1, z1f2, z1, dump + (n * 2) + 2, m);
+    _karatsuba(z1f1, z1f2, z1, dump + (n + 4) * 2, m + 1 + (n % 2));
 
     /* Subtrai em z1 os valores de z2 e z0 conforme especificação */
-    big_number_summation(z0, z2, temp_sum, n);
-    big_number_subtraction(z1, temp_sum, z1, n);
+    big_number_summation(z0, z2, temp_sum, n - (n % 2));
+
+    if(n % 2 != 0) {
+      char soma = temp_sum[n - 1] + z2[n - 1];
+      temp_sum[n - 1] = soma % 10;
+      temp_sum[n] = soma / 10;
+    }
+
+    temp_sum[n + 1] = temp_sum[n + 2] = temp_sum[n + 3] = 0;
+    big_number_subtraction(z1, temp_sum, z1, n + 4);
 
     /* Adiciona z1 no resultado em [n/2...2n/3] */
-    big_number_summation(dest + m, z1, dest + m, n);
+    big_number_summation(dest + m, z1, dest + m, n + 4);
   }
 }
 
@@ -198,6 +219,37 @@ unsigned int min_power_of_2(unsigned int n1, unsigned int n2) {
   return result;
 }
 
+int get_file_length(const char *filename) {
+  FILE *fp;
+  int ret;
+
+  if((fp = fopen(filename, "r")) == NULL) {
+    fprintf(stdout, "Falha ao abrir o arquivo \"%s\".\n", filename);
+    exit(-1);
+  }
+
+  fseek(fp, 0, SEEK_END);
+  ret = ftell(fp);
+  fclose(fp);
+  return ret;  
+}
+
+void fget_big_number(const char *filename, big_number_t x, unsigned int n) {
+  FILE *fp;
+  int i;
+
+  if((fp = fopen(filename, "r")) == NULL) {
+    fprintf(stdout, "Falha ao abrir o arquivo \"%s\".\n", filename);
+    exit(-1);
+  }
+
+  for(i = n - 1; i >= 0; --i) {
+    x[i] = fgetc(fp) - '0';
+  }
+
+  fclose(fp);
+}
+
 /* Função principal */
 int main(int argc, const char *argv[]) {
   big_number_t x, y, d;
@@ -205,17 +257,24 @@ int main(int argc, const char *argv[]) {
   int p1, p2;
 
   /* Verifica argumentos */
-  if(argc < 3) {
-    fprintf(stdout, "Uso: %s <factor 1> <factor 2>\n", argv[0]);
+  if(argc < 2 || (argv[1][0] == '-' && argv[1][1] == '\0' && argc < 4)) {
+    fprintf(stdout, "Uso: %s <filename 1> <filename 2>\n"
+                    "     %s - <factor 1> <factor 2>\n", argv[0], argv[0]);
     return 0;
   }
 
   /* Tamanho das entradas */
-  len1 = strlen(argv[1]);
-  len2 = strlen(argv[2]);
+  if(argv[1][0] == '-' && argv[1][1] == '\0') {
+    len1 = strlen(argv[2]);
+    len2 = strlen(argv[3]);
+  } else {
+    len1 = get_file_length(argv[1]);
+    len2 = get_file_length(argv[2]);
+  }
 
   /* Para facilitar, n será a menor potência de 2 maior que o tamanho das entradas */
-  n = min_power_of_2(len1, len2);
+  //n = min_power_of_2(len1, len2);
+  n = (len1 > len2) ? len1 : len2;
 
   /* Aloca memória para armazenar os Big Numbers e o resultado */
   x = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * n);
@@ -226,21 +285,27 @@ int main(int argc, const char *argv[]) {
   for(i = 0; i < n; ++i) {
     x[i] = 0;
     y[i] = 0;
-    d[i] = d[n + i] = 0;
+    d[i] = d[i + n] = 0;
   }
 
-  /* Armazena os valores lido na ordem inversa */
-  p1 = len1 - 1;
-  p2 = len2 - 1;
+  /* Se o primeiro parâmetro é "-" */
+  if(argv[1][0] == '-' && argv[1][1] == '\0') {
+    /* Armazena os valores lido na ordem inversa */
+    p1 = len1 - 1;
+    p2 = len2 - 1;
 
-  for(i = 0; i < n; ++i) {
-    if(p1 >= 0) {
-      x[i] = argv[1][p1--] - '0';
-    }
+    for(i = 0; i < n; ++i) {
+      if(p1 >= 0) {
+        x[i] = argv[2][p1--] - '0';
+      }
 
-    if(p2 >= 0) {
-      y[i] = argv[2][p2--] - '0';
+      if(p2 >= 0) {
+        y[i] = argv[3][p2--] - '0';
+      }
     }
+  } else {
+    fget_big_number(argv[1], x, len1);
+    fget_big_number(argv[2], y, len2);
   }
 
   /* Realiza a multiplicação de Karatsuba */
