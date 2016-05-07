@@ -221,11 +221,6 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
       z1f1[i] = z1f2[i] = 0;
     }
 
-    static int sum_count = 0;
-
-    ++sum_count;
-    fprintf(stdout, "sum_count = %d\n", sum_count);
-
     /* Calcula os fatores de z1 */
     big_number_summation(x, x + m, z1f1, m, m + (n % 2));
     big_number_summation(y, y + m, z1f2, m, m + (n % 2));
