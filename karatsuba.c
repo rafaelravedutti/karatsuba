@@ -33,7 +33,7 @@ typedef char *big_number_t;
 
 /* Funções de operação com Big Numbers */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
-void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
+int big_number_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void big_number_subtraction(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n);
@@ -71,9 +71,14 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
 }
 
 /* Soma de Big Numbers */
-void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
+int big_number_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
   char carry, res;
   unsigned int i;
+
+  fprintf(stdout, "\nSUM: ");
+  fprint_big_number(stdout, x, n);
+  fprintf(stdout, " + ");
+  fprint_big_number(stdout, y, n);
 
   /* Percorre os elementos, realizando a soma e verificando os problemas de carry */
   for(i = 0, carry = 0; i < n; ++i) {
@@ -82,8 +87,12 @@ void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, uns
     carry = res / 10;
   }
 
-  /* Armazena o carry que sobrou no valor mais significativo (resultado tem n + 1 elementos) */
-  dest[n] = carry;
+  fprintf(stdout, " = ");
+  fprint_big_number(stdout, dest, n+1);
+  fprintf(stdout, "\n");
+
+  /* Devolve o carry que sobrou, para ser tratado externamente (resultado tem n elementos) */
+  return carry;
 }
 
 /* Subtração de Big Numbers */
@@ -126,9 +135,6 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 
 /* Karatsuba (recursões) */
 void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n) {
-  fprint_big_number(stdout, x, n);
-  fprintf(stdout, " x ");
-  fprint_big_number(stdout, y, n);
   unsigned int m;
   big_number_t z0, z1, z2, z1f1, z1f2, temp_sum;
 
@@ -157,13 +163,15 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
   } else {
     /* Resolve z0 recursivamente */
     _karatsuba(x, y, z0, dump + (n + 4) * 2, m);
+
     /* Resolve z2 recursivamente */
     _karatsuba(x + m, y + m, z2, dump + (n + 4) * 2, n - m);
 
     /* Calcula os fatores de z1 */
-    big_number_summation(x, x + m, z1f1, m);
-    big_number_summation(y, y + m, z1f2, m);
+    if(big_number_summation(x, x + m, z1f1, m)) z1f1[m] = 1;
+    if(big_number_summation(y, y + m, z1f2, m)) z1f2[m] = 1;
 
+    /* Normaliza fatores para tamanho m + 2 */
     if(n % 2 != 0) {
       char soma = z1f1[m] + x[m + m];
       z1f1[m] = soma % 10;
@@ -172,26 +180,53 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
       soma = z1f2[m] + y[m + m];
       z1f2[m] = soma % 10;
       z1f2[m + 1] = soma / 10;
-    }
+    } else
+      z1f1[m + 1] = z1f2[m + 1] = 0;
 
     /* Resolve z1 recursivamente */
-    _karatsuba(z1f1, z1f2, z1, dump + (n + 4) * 2, m + 1 + (n % 2));
+    _karatsuba(z1f1, z1f2, z1, dump + (n + 4) * 2, m + 2);
+
+    /* Normaliza z1 para tamanho n + 4 */
+    if(n % 2 != 0)
+      z1[n + 3] = 0;
 
     /* Subtrai em z1 os valores de z2 e z0 conforme especificação */
-    big_number_summation(z0, z2, temp_sum, n - (n % 2));
+    if(big_number_summation(z0, z2, temp_sum, m+m)) temp_sum[m+m] = 1;
 
+    /* Normaliza soma de z0 e z2 para tamanho n + 4 */
     if(n % 2 != 0) {
       char soma = temp_sum[n - 1] + z2[n - 1];
       temp_sum[n - 1] = soma % 10;
       temp_sum[n] = soma / 10;
-    }
 
-    temp_sum[n + 1] = temp_sum[n + 2] = temp_sum[n + 3] = 0;
+      soma = temp_sum[n] + z2[n];
+      temp_sum[n] = soma % 10;
+      temp_sum[n + 1] = soma / 10;
+    } else
+      temp_sum[n + 1] = 0;
+    temp_sum[n + 2] = temp_sum[n + 3] = 0;
+
     big_number_subtraction(z1, temp_sum, z1, n + 4);
 
     /* Adiciona z1 no resultado em [n/2...2n/3] */
-    big_number_summation(dest + m, z1, dest + m, n + 4);
+    if(big_number_summation(dest + m, z1, dest + m, n + 4)) {
+      int carry = 1, p = m + n + 4;
+      while(carry) {
+        int soma = dest[p] + carry;
+        dest[p] = soma % 10;
+        carry = soma / 10;
+
+        p++;
+      }
+    }
   }
+  fprintf(stdout, "\nMUL: ");
+  fprint_big_number(stdout, x, n);
+  fprintf(stdout, " x ");
+  fprint_big_number(stdout, y, n);
+  fprintf(stdout, " = ");
+  fprint_big_number(stdout, dest, n * 2);
+  fprintf(stdout, "\n");
 }
 
 /* Imprime um Big Number na saída especificada */
