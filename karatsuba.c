@@ -23,8 +23,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Debug */
+//#define DEBUG
 /* Tamanho a partir do qual será executada a multiplicação "ingênua" */
-#define CUTOFF                16
+#define CUTOFF                8 
 /* Tamanho da granularidade (elementos) dos Big Numbers */
 #define BIGNUM_GRANULE_SIZE   sizeof(char)
 
@@ -49,10 +51,12 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
   char res;
   int carry;
 
+#ifdef DEBUG
   fprintf(stdout, "NAIVE(%u, %u): ", n, n);
   fprint_big_number(stdout, x, n);
   fprintf(stdout, " x ");
   fprint_big_number(stdout, y, n);
+#endif
 
   /* Zera os valores do resultado */
   for(i = 0; i < n * 2; ++i) {
@@ -74,9 +78,12 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
     dest[i + n] = carry;
   }
 
+#ifdef DEBUG
   fprintf(stdout, " = ");
   fprint_big_number(stdout, dest, n * 2);
   fprintf(stdout, "\n");
+#endif
+
 }
 
 /* Soma de Big Numbers */
@@ -85,10 +92,12 @@ void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, uns
   char carry, res;
   unsigned int i, min, max;
 
+#ifdef DEBUG
   fprintf(stdout, "SUM(%u, %u): ", nx, ny);
   fprint_big_number(stdout, x, nx);
   fprintf(stdout, " + ");
   fprint_big_number(stdout, y, ny);
+#endif
 
   min = (nx < ny) ? nx : ny;
   max = (nx > ny) ? nx : ny;
@@ -110,9 +119,12 @@ void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, uns
 
   dest[max] += carry;
 
+#ifdef DEBUG
   fprintf(stdout, " = ");
   fprint_big_number(stdout, dest, max + 1);
   fprintf(stdout, " (CARRY = %d)\n", carry);
+#endif
+
 }
 
 /* Subtração de Big Numbers */
@@ -120,10 +132,12 @@ void big_number_subtraction(big_number_t x, big_number_t y, big_number_t dest, u
   char carry, res;
   unsigned int i;
 
+#ifdef DEBUG
   fprintf(stdout, "SUB(%u, %u): ", nx, ny);
   fprint_big_number(stdout, x, nx);
   fprintf(stdout, " - ");
   fprint_big_number(stdout, y, ny);
+#endif
 
   /* Realiza a subtração em cada elemento, verificando problemas de carry */
   for(i = 0, carry = 1; i < ny; ++i) {
@@ -139,9 +153,12 @@ void big_number_subtraction(big_number_t x, big_number_t y, big_number_t dest, u
     carry = res / 10;
   }
 
+#ifdef DEBUG
   fprintf(stdout, " = ");
   fprint_big_number(stdout, dest, nx);
   fprintf(stdout, "\n");
+#endif
+
 }
 
 /* Karatsuba (base) */
@@ -149,7 +166,7 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
   big_number_t dump;
 
   /* Aloca região de memória usada para armazenar resultados temporários */
-  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * (n + 4) * 4);
+  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * ((n + 4) * 4 + n));
 
   /* Se não ocorreu erro ao alocar */
   if(dump != NULL) {
@@ -203,6 +220,11 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
     for(i = 0; i < m + 2; ++i) {
       z1f1[i] = z1f2[i] = 0;
     }
+
+    static int sum_count = 0;
+
+    ++sum_count;
+    fprintf(stdout, "sum_count = %d\n", sum_count);
 
     /* Calcula os fatores de z1 */
     big_number_summation(x, x + m, z1f1, m, m + (n % 2));
