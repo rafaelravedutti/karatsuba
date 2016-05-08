@@ -181,8 +181,7 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
   unsigned int m, nz0, nz1, nz2, nz1f, i;
   big_number_t z0, z1, z2, z1f1, z1f2, temp_sum;
 
-  /* Define m, como n é sempre potência de 2, então n / 2 será inteiro em
-     todas as recursões, por questões de facilidade */
+  /* Define valor de m */
   m = n / 2;
 
   /* z0 aponta para o resultado em [0..n-1] e z2 aponta para o resultado em [n..2n-1],
