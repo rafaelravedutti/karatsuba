@@ -43,7 +43,6 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
 /* Funções auxiliares */
 void fprint_big_number(FILE *out, big_number_t x, unsigned int n);
 void fix_carry(big_number_t x, unsigned int n);
-unsigned int min_power_of_2(unsigned int n1, unsigned int n2);
 
 /* Multiplicação "ingênua" */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
@@ -261,18 +260,6 @@ void fprint_big_number(FILE *out, big_number_t x, unsigned int n) {
   }
 }
 
-/* Obtêm a menor potência de 2 maior que n1 e n2 */
-unsigned int min_power_of_2(unsigned int n1, unsigned int n2) {
-  unsigned int result = 2;
-
-  /* Enquanto o resultado for menor que n1 e n2, multiplica-o por 2 */
-  while(result < n1 || result < n2) {
-    result *= 2;
-  }
-
-  return result;
-}
-
 int get_file_length(const char *filename) {
   FILE *fp;
   int ret;
@@ -322,11 +309,11 @@ int main(int argc, const char *argv[]) {
     len1 = strlen(argv[2]);
     len2 = strlen(argv[3]);
   } else {
-    len1 = get_file_length(argv[1]);
-    len2 = get_file_length(argv[2]);
+    len1 = get_file_length(argv[1]) - 1;
+    len2 = get_file_length(argv[2]) - 1;
   }
 
-  /* Para facilitar, n será a menor potência de 2 maior que o tamanho das entradas */
+  /* n será o tamanho da maior entrada */
   n = (len1 > len2) ? len1 : len2;
 
   /* Aloca memória para armazenar os Big Numbers e o resultado */
