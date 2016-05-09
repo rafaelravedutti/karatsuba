@@ -1,54 +1,134 @@
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba first.bn first.bn > first_x_first.output 
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba first.bn first.bn > first_x_first-1.output
 
-real  0m11.023s
-user  0m10.998s
-sys 0m0.019s
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba first.bn first.bn > first_x_first.output 
+real  0m7.075s
+user  0m7.058s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba first.bn first.bn > first_x_first-2.output
 
-real  0m12.080s
-user  0m12.052s
-sys 0m0.020s
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba first.bn first.bn > first_x_first.output 
+real  0m7.067s
+user  0m7.061s
+sys 0m0.000s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba first.bn first.bn > first_x_first-3.output
 
-real  0m12.040s
-user  0m12.022s
-sys 0m0.011s
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba second.bn second.bn > second_x_second.output 
+real  0m7.061s
+user  0m7.051s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba second.bn second.bn > second_x_second-1.output
 
-real  0m35.334s
-user  0m35.287s
-sys 0m0.032s
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba second.bn second.bn > second_x_second.output 
+real  0m21.203s
+user  0m21.148s
+sys 0m0.008s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba second.bn second.bn > second_x_second-1.output
 
-real  0m34.812s
-user  0m34.761s
-sys 0m0.032s
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba second.bn second.bn > second_x_second.output 
+real  0m21.260s
+user  0m21.236s
+sys 0m0.008s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba second.bn second.bn > second_x_second-1.output
 
-real  0m36.092s
-user  0m36.032s
-sys 0m0.044s
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba third.bn third.bn > third_x_third.output 
+real  0m21.192s
+user  0m21.157s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba second.bn second.bn > second_x_second-2.output
 
-real  1m8.209s
-user  1m8.137s
-sys 0m0.045s
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba third.bn third.bn > third_x_third.output 
+real  0m21.155s
+user  0m21.142s
+sys 0m0.005s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba second.bn second.bn > second_x_second-3.output
 
-real  1m45.884s
-user  1m45.742s
-sys 0m0.114s
-rrlm13@macalan:~/repositories/karatsuba$ time ./karatsuba third.bn third.bn > third_x_third.output 
+real  0m21.171s
+user  0m21.155s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba third.bn third.bn > third_x_third-1.output
 
-real  1m13.559s
-user  1m13.493s
-sys 0m0.044s
-rrlm13@macalan:~/repositories/karatsuba$ 
-rrlm13@macalan:~/repositories/karatsuba$ 
-rrlm13@macalan:~/repositories/karatsuba$ wc first.bn 
-    1     1 90113 first.bn
-rrlm13@macalan:~/repositories/karatsuba$ wc second.bn 
-     1      1 180225 second.bn
-rrlm13@macalan:~/repositories/karatsuba$ wc third.bn 
-     1      1 360449 third.bn
+real  1m3.581s
+user  1m3.512s
+sys 0m0.016s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba third.bn third.bn > third_x_third-2.output
 
+real  1m3.168s
+user  1m3.146s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba third.bn third.bn > third_x_third-3.output
+
+real  1m3.220s
+user  1m3.149s
+sys 0m0.016s
+rrlm13@talisker:~/repositories/karatsuba$ ls
+first.bn                first_x_first-2.output  first_x_first.output  karatsuba.c  second_x_second-1.output  second_x_second-3.output  test_session.log  third_x_third-1.output  third_x_third-3.output
+first_x_first-1.output  first_x_first-3.output  karatsuba             second.bn    second_x_second-2.output  second_x_second.output    third.bn          third_x_third-2.output  third_x_third.output
+rrlm13@talisker:~/repositories/karatsuba$ sed "s/9/5/g" first.bn | less
+rrlm13@talisker:~/repositories/karatsuba$ sed "s/9/5/g" first.bn > fourty.bn
+rrlm13@talisker:~/repositories/karatsuba$ sed "s/9/5/g" second.bn > fifth.bin
+rrlm13@talisker:~/repositories/karatsuba$ sed "s/9/5/g" third.bn > sixth.bn
+rrlm13@talisker:~/repositories/karatsuba$ mv fifth.bin fifth.bn
+rrlm13@talisker:~/repositories/karatsuba$ ls -lhtra
+total 11M
+drwxr-xr-x 11 rrlm13 bcc 4,0K Mai  3 09:36 ..
+-rw-r--r--  1 rrlm13 bcc  89K Mai  7 21:30 first.bn
+-rw-r--r--  1 rrlm13 bcc 177K Mai  7 21:30 second.bn
+-rw-r--r--  1 rrlm13 bcc 353K Mai  7 21:30 third.bn
+-rwxr-xr-x  1 rrlm13 bcc  14K Mai  7 21:30 karatsuba
+-rw-r--r--  1 rrlm13 bcc 353K Mai  7 21:32 first_x_first.output
+-rw-r--r--  1 rrlm13 bcc 705K Mai  7 21:35 second_x_second.output
+-rw-r--r--  1 rrlm13 bcc 1,4M Mai  7 21:40 third_x_third.output
+-rw-r--r--  1 rrlm13 bcc 1,7K Mai  7 21:41 test_session.log
+-rw-r--r--  1 rrlm13 bcc  10K Mai  7 21:45 karatsuba.c
+drwxr-xr-x  8 rrlm13 bcc 4,0K Mai  9 15:33 .git
+-rw-r--r--  1 rrlm13 bcc 353K Mai  9 15:47 first_x_first-1.output
+-rw-r--r--  1 rrlm13 bcc 353K Mai  9 15:47 first_x_first-2.output
+-rw-r--r--  1 rrlm13 bcc 353K Mai  9 15:47 first_x_first-3.output
+-rw-r--r--  1 rrlm13 bcc 705K Mai  9 15:51 second_x_second-1.output
+-rw-r--r--  1 rrlm13 bcc 705K Mai  9 15:52 second_x_second-2.output
+-rw-r--r--  1 rrlm13 bcc 705K Mai  9 15:53 second_x_second-3.output
+-rw-r--r--  1 rrlm13 bcc 1,4M Mai  9 15:54 third_x_third-1.output
+-rw-r--r--  1 rrlm13 bcc 1,4M Mai  9 15:55 third_x_third-2.output
+-rw-r--r--  1 rrlm13 bcc 1,4M Mai  9 15:58 third_x_third-3.output
+-rw-r--r--  1 rrlm13 bcc  89K Mai  9 16:00 fourty.bn
+-rw-r--r--  1 rrlm13 bcc 177K Mai  9 16:01 fifth.bn
+-rw-r--r--  1 rrlm13 bcc 353K Mai  9 16:01 sixth.bn
+drwxr-xr-x  3 rrlm13 bcc 4,0K Mai  9 16:01 .
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba fourth.bn fourth.bn > fourth_x_fourth-1.output
+
+real  0m7.044s
+user  0m7.018s
+sys 0m0.008s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba fourth.bn fourth.bn > fourth_x_fourth-2.output
+
+real  0m7.032s
+user  0m7.027s
+sys 0m0.000s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba fourth.bn fourth.bn > fourth_x_fourth-3.output
+
+real  0m7.087s
+user  0m7.077s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba fifth.bn fifth.bn > fifth_x_fifth-1.output 
+
+real  0m21.083s
+user  0m21.057s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba fifth.bn fifth.bn > fifth_x_fifth-2.output 
+
+real  0m21.111s
+user  0m21.099s
+sys 0m0.000s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba fifth.bn fifth.bn > fifth_x_fifth-3.output 
+
+real  0m21.065s
+user  0m21.045s
+sys 0m0.008s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba sixth.bn sixth.bn > sixth_x_sixth-1.output 
+
+real  1m3.485s
+user  1m3.463s
+sys 0m0.000s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba sixth.bn sixth.bn > sixth_x_sixth-2.output 
+
+real  1m3.387s
+user  1m3.358s
+sys 0m0.008s
+rrlm13@talisker:~/repositories/karatsuba$ time ./karatsuba sixth.bn sixth.bn > sixth_x_sixth-3.output 
+
+real  1m3.129s
+user  1m3.100s
+sys 0m0.008s
