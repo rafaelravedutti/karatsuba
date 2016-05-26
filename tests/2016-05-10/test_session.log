@@ -1,0 +1,84 @@
+first.bn first.bn
+
+real	0m8.020s
+user	0m8.005s
+sys	0m0.011s
+
+real	0m8.004s
+user	0m7.994s
+sys	0m0.007s
+
+real	0m7.993s
+user	0m7.983s
+sys	0m0.007s
+--------
+second.bn second.bn
+
+real	0m23.886s
+user	0m23.867s
+sys	0m0.015s
+
+real	0m23.907s
+user	0m23.893s
+sys	0m0.011s
+
+real	0m23.904s
+user	0m23.893s
+sys	0m0.007s
+--------
+third.bn third.bn
+
+real	0m47.173s
+user	0m47.162s
+sys	0m0.007s
+
+real	0m47.218s
+user	0m47.195s
+sys	0m0.019s
+
+real	0m47.424s
+user	0m47.381s
+sys	0m0.011s
+--------
+fourth.bn fourth.bn
+
+real	0m8.042s
+user	0m8.027s
+sys	0m0.011s
+
+real	0m8.015s
+user	0m8.003s
+sys	0m0.010s
+
+real	0m8.041s
+user	0m8.026s
+sys	0m0.007s
+--------
+fifth.bn fifth.bn
+
+real	0m24.012s
+user	0m24.005s
+sys	0m0.003s
+
+real	0m24.004s
+user	0m23.986s
+sys	0m0.015s
+
+real	0m23.938s
+user	0m23.925s
+sys	0m0.008s
+--------
+sixth.bn sixth.bn
+
+real	0m47.197s
+user	0m47.159s
+sys	0m0.028s
+
+real	0m47.134s
+user	0m47.119s
+sys	0m0.011s
+
+real	0m47.141s
+user	0m47.086s
+sys	0m0.019s
+--------

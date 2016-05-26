@@ -1,0 +1,7 @@
+Teste 2, por Felix Liu
+Cutoff definido: 42 dígitos
+Versão sequencial
+Realizadas em talisker
+
+Os testes referentes a third.bn e sixth.bn em test_session.log são referentes a entradas com 3*112500 = 337500 dígitos
+Os arquivos third.bn e sixth.bn contêm 4*112500 = 450000 dígitos
