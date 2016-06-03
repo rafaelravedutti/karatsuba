@@ -27,7 +27,11 @@
 /* Debug */
 //#define DEBUG
 /* Tamanho da granularidade (elementos) dos Big Numbers */
-#define BIGNUM_GRANULE_SIZE   sizeof(char)
+#define BIGNUM_GRANULE_SIZE            sizeof(char)
+/* Likwid */
+#ifdef USE_LIKWID
+#include <likwid.h>
+#endif
 
 /* Big Number */
 typedef char *big_number_t;
@@ -46,6 +50,10 @@ void fprint_big_number(FILE *out, big_number_t x, unsigned int n);
 void naive_multiplication_sum(big_number_long orig, big_number_t dest, unsigned int n){
   int i, j;
 
+#ifdef USE_LIKWID
+  LIKWID_MARKER_START("NaiveSum");
+#endif
+
 #pragma omp parallel for private(i)
   for(j = 0; j < 2*n; ++j){
     int soma = 0;
@@ -61,11 +69,21 @@ void naive_multiplication_sum(big_number_long orig, big_number_t dest, unsigned 
     dest[i] = soma % 10;
     carry = soma / 10;
   }
+
+#ifdef USE_LIKWID
+  LIKWID_MARKER_STOP("NaiveSum");
+#endif
+
 }
 
 /* Etapa de multiplicação por um dígico da multiplicação ingênua */
 void naive_single_multiplication(big_number_t y, char x, big_number_long dest, unsigned int n){
   int i, carry, prod;
+
+#ifdef USE_LIKWID
+  LIKWID_MARKER_START("NaiveSingleProd");
+#endif
+
   carry = 0;
   for(i=0; i<n; i++){
     prod = x*y[i] + carry;
@@ -73,14 +91,22 @@ void naive_single_multiplication(big_number_t y, char x, big_number_long dest, u
     carry = prod / 10;
   }
   dest[n] = carry;
+
+#ifdef USE_LIKWID
+  LIKWID_MARKER_STOP("NaiveSingleProd");
+#endif
+
 }
 
 /* Multiplicação "ingênua" */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
   unsigned int i, j;
-  char res;
-  int carry;
   big_number_long rt;
+
+#ifdef USE_LIKWID
+  LIKWID_MARKER_INIT;
+  LIKWID_MARKER_START("Naive");
+#endif
 
   rt = (big_number_long) malloc((n+1)*(2*n+1)*sizeof(int));
   if(!rt){
@@ -113,6 +139,11 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
   naive_multiplication_sum(rt, dest, n);
 
   free(rt);
+
+#ifdef USE_LIKWID
+  LIKWID_MARKER_STOP("Naive");
+  LIKWID_MARKER_CLOSE;
+#endif
 
 /*
 #ifdef DEBUG

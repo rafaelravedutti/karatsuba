@@ -3,7 +3,7 @@ CC=gcc
 
 # Likwid
 LIKWID_PATH=/home/soft/likwid
-LIKWID_OPTIONS=-DUSE_LIKWID -I $(LIKWID_PATH)/include -L $(LIKWID_PATH)/lib -DLIKWID_PERFMON -llikwid
+LIKWID_OPTIONS=-DLIKWID_PERFMON -DUSE_LIKWID -I $(LIKWID_PATH)/include -L $(LIKWID_PATH)/lib -llikwid
 #LIKWID_OPTIONS=
 
 # Compiler options
