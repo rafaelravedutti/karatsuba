@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Mostra resultado */
+//#define SHOW_RESULT
 /* Debug */
 //#define DEBUG
 /* Tamanho a partir do qual será executada a multiplicação "ingênua" */
@@ -67,6 +69,7 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
     carry = 0;
 
     /* Realiza a multiplicação com os termos de y e soma no destino, verificando problemas de carry */
+//    #pragma omp parallel for schedule(static) private(j, res, carry)
     for(j = 0; j < n; ++j) {
       res = carry + dest[i + j] + x[i] * y[j];
       dest[i + j] = res % 10;
@@ -350,6 +353,7 @@ int main(int argc, const char *argv[]) {
   /* Realiza a multiplicação de Karatsuba */
   karatsuba(x, y, d, n);
 
+#ifdef SHOW_RESULT
   /* Imprime resultado */
   fprint_big_number(stdout, x, n);
   fprintf(stdout, " x ");
@@ -357,6 +361,7 @@ int main(int argc, const char *argv[]) {
   fprintf(stdout, " = ");
   fprint_big_number(stdout, d, n * 2);
   fprintf(stdout, "\n");
+#endif
 
   /* Libera memória ocupada pelos Big Numbers */
   free(x);
