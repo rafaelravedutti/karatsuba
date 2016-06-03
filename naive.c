@@ -70,8 +70,6 @@ void naive_single_multiplication(big_number_t y, char x, big_number_long dest, u
 /* Multiplicação "ingênua" */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
   unsigned int i, j;
-  char res;
-  int carry;
   big_number_long rt;
 
   rt = (big_number_long) malloc(n*(2*n+1)*sizeof(int));
