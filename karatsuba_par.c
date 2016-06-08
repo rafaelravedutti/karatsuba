@@ -38,11 +38,44 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
 void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int nx, unsigned int ny);
 void big_number_subtraction(big_number_t x, big_number_t y, big_number_t dest, unsigned int nx, unsigned int ny);
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
-void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n);
+void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size);
+void __karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size);
 
 /* Funções auxiliares */
 void fprint_big_number(FILE *out, big_number_t x, unsigned int n);
 void fix_carry(big_number_t x, unsigned int n);
+long long unsigned mem_size(unsigned int n, long long unsigned *m);
+long long unsigned _mem_size(unsigned int n, long long unsigned *m);
+
+
+
+/*
+long long unsigned mem_size(unsigned int n, long long unsigned *m){
+  for(int i=0; i<=n; ++i)
+    m[i] = 0;
+  return _mem_size(n, m);
+}
+
+long long unsigned _mem_size(unsigned int n, long long unsigned *m){
+  if(n <= CUTOFF) return 0;
+  if(m[n]) return m[n];
+
+  m[n] = 4*(n/2+n%2+1) + 3*_mem_size(n/2+n%2+1, m);
+  return m[n];
+}
+// */
+
+//* versão iterativa do cálculo do tamanho da memória temporária
+long long unsigned mem_size(unsigned int n, long long unsigned *m){
+  for(int i=0; i<=n; ++i) m[i] = 0;
+  for(int i=CUTOFF+1; i<=n; ++i) m[i] = 4*(i/2+i%2+1) + 3*m[i/2+i%2+1];
+  return m[n];
+}
+
+inline long long unsigned _mem_size(unsigned int n, long long unsigned *m){
+  return m[n];
+}
+// */
 
 /* Multiplicação "ingênua" */
 void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
@@ -162,22 +195,32 @@ void big_number_subtraction(big_number_t x, big_number_t y, big_number_t dest, u
 
 /* Karatsuba (base) */
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n) {
-  big_number_t dump;
+
+  /* Aloca tamanhos da região de memória usada para armazenar resultados temporários */
+  long long unsigned *m = (long long unsigned*) malloc((n+1)*sizeof(long long unsigned));
+  if(!m){
+    perror("Falha ao calcular tamanho da memória temporária");
+    exit(-1);
+  }
 
   /* Aloca região de memória usada para armazenar resultados temporários */
-  dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * ((n + 4) * 4 + n));
-
-  /* Se não ocorreu erro ao alocar */
-  if(dump != NULL) {
-    /* Chama a função recursiva de Karatsuba, junto com o dump */
-    _karatsuba(x, y, dest, dump, n);
-    /* Libera a região de memória temporária */
-    free(dump);
+  big_number_t dump = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * mem_size(n, m));
+  if(!dump){
+    perror("Falha ao alocar memória temporária");
+    exit(-1);
   }
+//  ims(n, m);
+
+  /* Chama a função recursiva de Karatsuba, junto com o dump */
+  _karatsuba(x, y, dest, dump, n, m);
+
+  /* Libera a região de memória temporária */
+  free(dump);
+  free(m);
 }
 
 /* Karatsuba (recursões) */
-void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n) {
+void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size) {
   unsigned int m, nz0, nz1, nz2, nz1f, i;
   big_number_t z0, z1, z2, z1f1, z1f2, temp_sum;
 
@@ -191,11 +234,11 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
 
   /* Usa a região de dump para calcular z1 e seus fatores (x0+xm e y0+ym) */
   z1 = dump;
-  z1f1 = dump + n + 4;
-  z1f2 = dump + n + 4 + m + 2;
+  z1f1 = dump + 2*(n-m+1);
+  z1f2 = dump + 3*(n-m+1);
 
   /* Região temporária para armazenar z0 + z2 */
-  temp_sum = dump + n + 4;
+  temp_sum = dump + 2*(n-m+1);
 
   /* Tamanhos */
   nz0 = m * 2;
@@ -209,11 +252,75 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
     naive_multiplication(x, y, dest, n);
   /* Caso contrário, resolve recursões */
   } else {
-    /* Resolve z0 recursivamente */
-    _karatsuba(x, y, z0, dump + (n + 4) * 2, m);
-    /* Resolve z2 recursivamente */
-    _karatsuba(x + m, y + m, z2, dump + (n + 4) * 2, n - m);
+    /* Zera fatores de z1 */
+    for(i = 0; i < m + 2; ++i) {
+      z1f1[i] = z1f2[i] = 0;
+    }
 
+    /* Calcula os fatores de z1 */
+    big_number_summation(x, x + m, z1f1, m, m + (n % 2));
+    big_number_summation(y, y + m, z1f2, m, m + (n % 2));
+
+#pragma omp parallel sections
+    {
+#pragma omp section
+      /* Resolve z1 recursivamente */
+      __karatsuba(z1f1, z1f2, z1, dump + 4*(n-m+1), nz1f, temp_size);
+#pragma omp section
+      /* Resolve z0 recursivamente */
+      __karatsuba(x, y, z0, dump + 4*(n-m+1) + _mem_size(n-m+1, temp_size), m, temp_size);
+#pragma omp section
+      /* Resolve z2 recursivamente */
+      __karatsuba(x + m, y + m, z2, dump + 4*(n-m+1) + 2*_mem_size(n-m+1, temp_size), n - m, temp_size);
+    }
+
+    /* Zera temp_sum */
+    for(i = 0; i < n + 4; ++i) {
+      temp_sum[i] = 0;
+    }
+
+    /* Subtrai em z1 os valores de z2 e z0 conforme especificação */
+    big_number_summation(z0, z2, temp_sum, nz0, nz2);
+    big_number_subtraction(z1, temp_sum, z1, nz1, nz2 + 1);
+
+    /* Adiciona z1 no resultado em [n/2...2n/3] */
+    big_number_summation(dest + m, z1, dest + m, nz1, nz1);
+  }
+}
+
+/* Karatsuba (recursões) */
+void __karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size) {
+  unsigned int m, nz0, nz1, nz2, nz1f, i;
+  big_number_t z0, z1, z2, z1f1, z1f2, temp_sum;
+
+  /* Define valor de m */
+  m = n / 2;
+
+  /* z0 aponta para o resultado em [0..n-1] e z2 aponta para o resultado em [n..2n-1],
+     conforme especificação do algoritmo */
+  z0 = dest;
+  z2 = dest + m + m;
+
+  /* Usa a região de dump para calcular z1 e seus fatores (x0+xm e y0+ym) */
+  z1 = dump;
+  z1f1 = dump + 2*(n-m+1);
+  z1f2 = dump + 3*(n-m+1);
+
+  /* Região temporária para armazenar z0 + z2 */
+  temp_sum = dump + 2*(n-m+1);
+
+  /* Tamanhos */
+  nz0 = m * 2;
+  nz2 = (n - m) * 2;
+  nz1f = m + (n % 2) + 1;
+  nz1 = nz1f * 2;
+
+  /* Se o tamanho é menor que o CUTOFF, resolve utilizando a multiplicação "ingênua",
+     este procedimento é feito para evitar diversas chamadas de funções e operações com pilha */
+  if(n <= CUTOFF) {
+    naive_multiplication(x, y, dest, n);
+  /* Caso contrário, resolve recursões */
+  } else {
     /* Zera fatores de z1 */
     for(i = 0; i < m + 2; ++i) {
       z1f1[i] = z1f2[i] = 0;
@@ -224,7 +331,11 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
     big_number_summation(y, y + m, z1f2, m, m + (n % 2));
 
     /* Resolve z1 recursivamente */
-    _karatsuba(z1f1, z1f2, z1, dump + (n + 4) * 2, nz1f);
+    __karatsuba(z1f1, z1f2, z1, dump + 4*(n-m+1), nz1f, temp_size);
+    /* Resolve z0 recursivamente */
+    __karatsuba(x, y, z0, dump + 4*(n-m+1) + _mem_size(n-m+1, temp_size), m, temp_size);
+    /* Resolve z2 recursivamente */
+    __karatsuba(x + m, y + m, z2, dump + 4*(n-m+1) + 2*_mem_size(n-m+1, temp_size), n - m, temp_size);
 
     /* Zera temp_sum */
     for(i = 0; i < n + 4; ++i) {
@@ -319,6 +430,11 @@ int main(int argc, const char *argv[]) {
   x = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * n);
   y = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * n);
   d = (big_number_t) malloc(BIGNUM_GRANULE_SIZE * n * 2);
+
+  if(!x || !y || !d){
+    perror("Falha ao ler entradas");
+    exit(-1);
+  }
 
   /* Inicializa Big Numbers */
   for(i = 0; i < n; ++i) {
