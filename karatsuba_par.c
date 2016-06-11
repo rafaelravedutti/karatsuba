@@ -66,13 +66,14 @@ long long unsigned _mem_size(unsigned int n, long long unsigned *m){
 // */
 
 //* versão iterativa do cálculo do tamanho da memória temporária
-long long unsigned mem_size(unsigned int n, long long unsigned *m){
-  for(int i=0; i<=n; ++i) m[i] = 0;
-  for(int i=CUTOFF+1; i<=n; ++i) m[i] = 4*(i/2+i%2+1) + 3*m[i/2+i%2+1];
+long long unsigned mem_size(unsigned int n, long long unsigned *m) {
+  unsigned int i;
+  for(i=0; i<=n; ++i) m[i] = 0;
+  for(i=CUTOFF+1; i<=n; ++i) m[i] = 4*(i/2+i%2+1) + 3*m[i/2+i%2+1];
   return m[n];
 }
 
-inline long long unsigned _mem_size(unsigned int n, long long unsigned *m){
+inline long long unsigned _mem_size(unsigned int n, long long unsigned *m) {
   return m[n];
 }
 // */
@@ -466,6 +467,7 @@ int main(int argc, const char *argv[]) {
   /* Realiza a multiplicação de Karatsuba */
   karatsuba(x, y, d, n);
 
+#ifdef PRINTABLE
   /* Imprime resultado */
   fprint_big_number(stdout, x, n);
   fprintf(stdout, " x ");
@@ -473,6 +475,7 @@ int main(int argc, const char *argv[]) {
   fprintf(stdout, " = ");
   fprint_big_number(stdout, d, n * 2);
   fprintf(stdout, "\n");
+#endif
 
   /* Libera memória ocupada pelos Big Numbers */
   free(x);

@@ -350,6 +350,7 @@ int main(int argc, const char *argv[]) {
   /* Realiza a multiplicação de Karatsuba */
   karatsuba(x, y, d, n);
 
+#ifdef PRINTABLE
   /* Imprime resultado */
   fprint_big_number(stdout, x, n);
   fprintf(stdout, " x ");
@@ -357,6 +358,7 @@ int main(int argc, const char *argv[]) {
   fprintf(stdout, " = ");
   fprint_big_number(stdout, d, n * 2);
   fprintf(stdout, "\n");
+#endif
 
   /* Libera memória ocupada pelos Big Numbers */
   free(x);
