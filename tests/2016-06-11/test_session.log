@@ -1,0 +1,91 @@
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba first.bn first.bn 
+
+real  0m7.950s
+user  0m7.936s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba first.bn first.bn 
+
+real  0m7.930s
+user  0m7.921s
+sys 0m0.008s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba first.bn first.bn 
+
+real  0m7.954s
+user  0m7.950s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par first.bn first.bn 
+
+real  0m2.684s
+user  0m7.975s
+sys 0m0.048s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par first.bn first.bn 
+
+real  0m2.676s
+user  0m7.927s
+sys 0m0.072s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par first.bn first.bn 
+
+real  0m2.675s
+user  0m7.941s
+sys 0m0.060s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba second.bn second.bn 
+
+real  0m23.782s
+user  0m23.763s
+sys 0m0.000s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba second.bn second.bn 
+
+real  0m23.871s
+user  0m23.867s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba second.bn second.bn 
+
+real  0m23.872s
+user  0m23.870s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par second.bn second.bn 
+
+real  0m8.011s
+user  0m23.824s
+sys 0m0.124s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par second.bn second.bn 
+
+real  0m8.008s
+user  0m23.805s
+sys 0m0.141s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par second.bn second.bn 
+
+real  0m8.001s
+user  0m23.796s
+sys 0m0.145s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba third.bn third.bn 
+
+real  1m11.754s
+user  1m11.709s
+sys 0m0.008s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba third.bn third.bn 
+
+real  1m11.202s
+user  1m11.162s
+sys 0m0.016s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba third.bn third.bn 
+
+real  1m11.633s
+user  1m11.625s
+sys 0m0.004s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par third.bn third.bn 
+
+real  0m23.994s
+user  1m11.281s
+sys 0m0.468s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par third.bn third.bn 
+
+real  0m23.987s
+user  1m11.331s
+sys 0m0.428s
+rrlm13@talisker:~/repositories/karatsuba/tests/2016-06-11$ time ../../karatsuba_par third.bn third.bn 
+
+real  0m23.985s
+user  1m11.352s
+sys 0m0.401s
+

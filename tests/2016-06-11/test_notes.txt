@@ -1,0 +1,5 @@
+Teste 3, por Rafael Ravedutti
+Cutoff definido: 42 dígitos
+Altura de paralelismo definida: 0 (raiz)
+Versões sequencial e paralela
+Realizadas em talisker

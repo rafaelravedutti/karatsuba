@@ -7,7 +7,7 @@ LIKWID_PATH=/home/soft/likwid
 LIKWID_OPTIONS=
 
 # Compiler options
-CC_OPTIONS=-fopenmp $(LIKWID_OPTIONS) -Wall -O0 -DPRINTABLE
+CC_OPTIONS=-fopenmp $(LIKWID_OPTIONS) -Wall -O0 
 
 all: karatsuba karatsuba_par
 
