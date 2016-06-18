@@ -29,6 +29,10 @@
 #define CUTOFF                42
 /* Tamanho da granularidade (elementos) dos Big Numbers */
 #define BIGNUM_GRANULE_SIZE   sizeof(char)
+/* Altura até onde paralelizar */
+#ifndef H
+#define H 1
+#endif
 
 /* Big Number */
 typedef char *big_number_t;
@@ -38,7 +42,7 @@ void naive_multiplication(big_number_t x, big_number_t y, big_number_t dest, uns
 void big_number_summation(big_number_t x, big_number_t y, big_number_t dest, unsigned int nx, unsigned int ny);
 void big_number_subtraction(big_number_t x, big_number_t y, big_number_t dest, unsigned int nx, unsigned int ny);
 void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n);
-void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size);
+void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size, unsigned int h);
 void __karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size);
 
 /* Funções auxiliares */
@@ -213,7 +217,7 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 //  ims(n, m);
 
   /* Chama a função recursiva de Karatsuba, junto com o dump */
-  _karatsuba(x, y, dest, dump, n, m);
+  _karatsuba(x, y, dest, dump, n, m, H);
 
   /* Libera a região de memória temporária */
   free(dump);
@@ -221,7 +225,7 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 }
 
 /* Karatsuba (recursões) */
-void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size) {
+void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t dump, unsigned int n, long long unsigned *temp_size, unsigned int h) {
   unsigned int m, nz0, nz1, nz2, nz1f, i;
   big_number_t z0, z1, z2, z1f1, z1f2, temp_sum;
 
@@ -262,17 +266,32 @@ void _karatsuba(big_number_t x, big_number_t y, big_number_t dest, big_number_t 
     big_number_summation(x, x + m, z1f1, m, m + (n % 2));
     big_number_summation(y, y + m, z1f2, m, m + (n % 2));
 
+    if(h){
 #pragma omp parallel sections
-    {
+      {
 #pragma omp section
-      /* Resolve z1 recursivamente */
-      __karatsuba(z1f1, z1f2, z1, dump + 4*(n-m+1), nz1f, temp_size);
+        /* Resolve z1 recursivamente */
+        _karatsuba(z1f1, z1f2, z1, dump + 4*(n-m+1), nz1f, temp_size, h-1);
 #pragma omp section
-      /* Resolve z0 recursivamente */
-      __karatsuba(x, y, z0, dump + 4*(n-m+1) + _mem_size(n-m+1, temp_size), m, temp_size);
+        /* Resolve z0 recursivamente */
+        _karatsuba(x, y, z0, dump + 4*(n-m+1) + _mem_size(n-m+1, temp_size), m, temp_size, h-1);
 #pragma omp section
-      /* Resolve z2 recursivamente */
-      __karatsuba(x + m, y + m, z2, dump + 4*(n-m+1) + 2*_mem_size(n-m+1, temp_size), n - m, temp_size);
+        /* Resolve z2 recursivamente */
+        _karatsuba(x + m, y + m, z2, dump + 4*(n-m+1) + 2*_mem_size(n-m+1, temp_size), n - m, temp_size, h-1);
+      }
+    }else{
+#pragma omp parallel sections
+      {
+#pragma omp section
+        /* Resolve z1 recursivamente */
+        __karatsuba(z1f1, z1f2, z1, dump + 4*(n-m+1), nz1f, temp_size);
+#pragma omp section
+        /* Resolve z0 recursivamente */
+        __karatsuba(x, y, z0, dump + 4*(n-m+1) + _mem_size(n-m+1, temp_size), m, temp_size);
+#pragma omp section
+        /* Resolve z2 recursivamente */
+        __karatsuba(x + m, y + m, z2, dump + 4*(n-m+1) + 2*_mem_size(n-m+1, temp_size), n - m, temp_size);
+      }
     }
 
     /* Zera temp_sum */
@@ -404,6 +423,9 @@ void fget_big_number(const char *filename, big_number_t x, unsigned int n) {
 
 /* Função principal */
 int main(int argc, const char *argv[]) {
+  /* Ativa paralelismo aninhado */
+  omp_set_nested(-1);
+
   big_number_t x, y, d;
   unsigned int n, len1, len2, i;
   int p1, p2;

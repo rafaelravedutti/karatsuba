@@ -1,0 +1,15 @@
+Teste 4, por Felix Liu
+Cutoff definido: 42 dígitos
+Versões sequencial e paralelas
+Realizadas em achel
+
+talisker estava fora do ar
+achel possui 32 núcleos de processamento
+Todos compilados com -O3
+
+Nome    Versão do Karatsuba
+kar     sequencial
+kp0     paralelo, h=0 (paralelismo na raiz)
+kp1     paralelo, h=1
+kp2     paralelo, h=2
+kp3     paralelo, h=3

@@ -1,0 +1,210 @@
+kar first.bn first.bn
+
+real	0m1.852s
+user	0m1.847s
+sys	0m0.005s
+
+real	0m1.849s
+user	0m1.848s
+sys	0m0.001s
+
+real	0m1.852s
+user	0m1.851s
+sys	0m0.001s
+
+kar second.bn second.bn
+
+real	0m5.207s
+user	0m5.206s
+sys	0m0.001s
+
+real	0m5.221s
+user	0m5.219s
+sys	0m0.001s
+
+real	0m5.206s
+user	0m5.202s
+sys	0m0.004s
+
+kar third.bn third.bn
+
+real	0m15.301s
+user	0m15.296s
+sys	0m0.005s
+
+real	0m15.278s
+user	0m15.273s
+sys	0m0.005s
+
+real	0m15.459s
+user	0m15.449s
+sys	0m0.009s
+
+kp0 first.bn first.bn
+
+real	0m0.802s
+user	0m2.328s
+sys	0m0.041s
+
+real	0m0.732s
+user	0m2.222s
+sys	0m0.028s
+
+real	0m0.720s
+user	0m2.219s
+sys	0m0.049s
+
+kp0 second.bn second.bn
+
+real	0m2.030s
+user	0m5.826s
+sys	0m0.110s
+
+real	0m1.987s
+user	0m5.838s
+sys	0m0.114s
+
+real	0m1.955s
+user	0m5.570s
+sys	0m0.143s
+
+kp0 third.bn third.bn
+
+real	0m5.474s
+user	0m15.868s
+sys	0m0.389s
+
+real	0m5.438s
+user	0m15.766s
+sys	0m0.406s
+
+real	0m5.452s
+user	0m15.937s
+sys	0m0.383s
+
+kp1 first.bn first.bn
+
+real	0m0.317s
+user	0m2.410s
+sys	0m0.046s
+
+real	0m0.239s
+user	0m1.930s
+sys	0m0.069s
+
+real	0m0.300s
+user	0m2.031s
+sys	0m0.048s
+
+kp1 second.bn second.bn
+
+real	0m0.677s
+user	0m5.550s
+sys	0m0.133s
+
+real	0m0.802s
+user	0m5.766s
+sys	0m0.123s
+
+real	0m0.791s
+user	0m5.927s
+sys	0m0.129s
+
+kp1 third.bn third.bn
+
+real	0m2.019s
+user	0m16.431s
+sys	0m0.366s
+
+real	0m1.957s
+user	0m16.068s
+sys	0m0.342s
+
+real	0m2.052s
+user	0m16.160s
+sys	0m0.327s
+
+kp2 first.bn first.bn
+
+real	0m0.177s
+user	0m2.376s
+sys	0m0.228s
+
+real	0m0.154s
+user	0m1.897s
+sys	0m0.100s
+
+real	0m0.166s
+user	0m2.036s
+sys	0m0.091s
+
+kp2 second.bn second.bn
+
+real	0m0.298s
+user	0m5.573s
+sys	0m0.186s
+
+real	0m0.352s
+user	0m5.596s
+sys	0m0.260s
+
+real	0m0.289s
+user	0m5.555s
+sys	0m0.298s
+
+kp2 third.bn third.bn
+
+real	0m0.801s
+user	0m16.276s
+sys	0m0.418s
+
+real	0m1.374s
+user	0m16.175s
+sys	0m0.386s
+
+real	0m0.873s
+user	0m16.577s
+sys	0m0.464s
+
+kp3 first.bn first.bn
+
+real	0m0.285s
+user	0m2.802s
+sys	0m0.633s
+
+real	0m0.199s
+user	0m1.999s
+sys	0m0.456s
+
+real	0m0.202s
+user	0m2.038s
+sys	0m0.410s
+
+kp3 second.bn second.bn
+
+real	0m0.381s
+user	0m5.683s
+sys	0m0.519s
+
+real	0m0.362s
+user	0m5.939s
+sys	0m0.565s
+
+real	0m0.384s
+user	0m5.892s
+sys	0m0.478s
+
+kp3 third.bn third.bn
+
+real	0m1.367s
+user	0m17.916s
+sys	0m0.909s
+
+real	0m1.732s
+user	0m18.276s
+sys	0m0.713s
+
+real	0m1.184s
+user	0m17.477s
+sys	0m0.900s
+
