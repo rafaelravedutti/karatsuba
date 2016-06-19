@@ -1,0 +1,13 @@
+Teste 5, por Felix Liu
+Cutoff definido: 42 dígitos
+Versões sequencial e paralelas, com alturas de paralelismo distintas
+Realizadas em macalan
+
+Os programas foram compilados com o define TEMPO para emitir medidas de tempo de execução
+
+Nome    Versão do Karatsuba
+kar     sequencial
+kp0     paralelo, h=0 (paralelismo na raiz)
+kp1     paralelo, h=1
+kp2     paralelo, h=2
+kp3     paralelo, h=3

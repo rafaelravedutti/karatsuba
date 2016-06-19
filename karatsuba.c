@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 
 /* Debug */
 //#define DEBUG
@@ -29,6 +30,14 @@
 #define CUTOFF                42
 /* Tamanho da granularidade (elementos) dos Big Numbers */
 #define BIGNUM_GRANULE_SIZE   sizeof(char)
+
+/* Tempos */
+#ifdef TEMPO
+/* Para medida de tempo total */
+double t_ini, t_fim;
+/* Medida de tempo da região paralelizada */
+double t_par_ini, t_par_fim;
+#endif
 
 /* Big Number */
 typedef char *big_number_t;
@@ -169,8 +178,18 @@ void karatsuba(big_number_t x, big_number_t y, big_number_t dest, unsigned int n
 
   /* Se não ocorreu erro ao alocar */
   if(dump != NULL) {
+
+#ifdef TEMPO
+  t_par_ini = omp_get_wtime();
+#endif
+
     /* Chama a função recursiva de Karatsuba, junto com o dump */
     _karatsuba(x, y, dest, dump, n);
+    
+#ifdef TEMPO
+  t_par_fim = omp_get_wtime();
+#endif
+    
     /* Libera a região de memória temporária */
     free(dump);
   }
@@ -292,6 +311,11 @@ void fget_big_number(const char *filename, big_number_t x, unsigned int n) {
 
 /* Função principal */
 int main(int argc, const char *argv[]) {
+
+#ifdef TEMPO
+  t_ini = omp_get_wtime();
+#endif
+
   big_number_t x, y, d;
   unsigned int n, len1, len2, i;
   int p1, p2;
@@ -364,5 +388,14 @@ int main(int argc, const char *argv[]) {
   free(x);
   free(y);
   free(d);
+
+#ifdef TEMPO
+  t_fim = omp_get_wtime();
+
+  printf("Tempo total: %.7g\n", t_fim - t_ini);
+  printf("Tempo região paralela: %.7g\n", t_par_fim - t_par_ini);
+  printf("Fração paralela: %.7g\n", (t_par_fim - t_par_ini)/(t_fim - t_ini));
+#endif
+
   return 0;
 }
